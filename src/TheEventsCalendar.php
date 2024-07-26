@@ -12,6 +12,10 @@ use function Roots\resource_path;
 
 class TheEventsCalendar
 {
+    private $sageFinder;
+    private $fileFinder;
+    private $app;
+
     public function __construct(
         ViewFinder $sageFinder,
         FileViewFinder $fileFinder,

@@ -85,7 +85,7 @@ class TheEventsCalendar
      */
     protected function isTribeTemplate(string $template): bool
     {
-        $plugin_path = dirname( \TRIBE_EVENTS_FILE );
+        $plugin_path = dirname(\TRIBE_EVENTS_FILE);
         $pos = strpos($template, $plugin_path);
         return $pos !== false;
     }
@@ -95,7 +95,7 @@ class TheEventsCalendar
      */
     protected function locateThemeTemplate(string $template): string
     {
-        $plugin_path = trailingslashit(dirname( \TRIBE_EVENTS_FILE ));
+        $plugin_path = trailingslashit(dirname(\TRIBE_EVENTS_FILE));
 
         // Convert any backslashes to forward slashes for Windows compatibility.
         if (DIRECTORY_SEPARATOR === '\\') {
@@ -105,6 +105,30 @@ class TheEventsCalendar
 
         $themeTemplate = 'tribe/events/v2' . str_replace($plugin_path . 'src/views/v2', '', $template);
 
-        return locate_template($this->sageFinder->locate($themeTemplate));
+        $directories = array_unique([get_stylesheet_directory(), get_template_directory()]);
+
+        // A candidate is only accepted when it resolves inside one of Acorn's
+        // registered view paths, matching the containment roots/acorn#572
+        // applies to the theme's own template hierarchy.
+        $viewPaths = [];
+
+        foreach ($this->fileFinder->getPaths() as $path) {
+            $viewPaths[] = trailingslashit(wp_normalize_path(realpath($path) ?: $path));
+        }
+
+        // Resolve the candidates directly. WordPress' locate_template() rejects
+        // theme-relative paths containing `..`, which is how Acorn addresses
+        // views that live outside the theme directory.
+        foreach ($this->sageFinder->locate($themeTemplate) as $candidate) {
+            foreach ($directories as $directory) {
+                $path = realpath("{$directory}/{$candidate}");
+
+                if ($path && Str::startsWith(wp_normalize_path($path), $viewPaths)) {
+                    return $path;
+                }
+            }
+        }
+
+        return '';
     }
 }

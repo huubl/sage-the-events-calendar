@@ -25,7 +25,8 @@
   "prefer-stable": true,
   "scripts": {
     "test": [
-      "phpcs --ignore=vendor --extensions=php --standard=PSR2 ."
+      "phpcs --ignore=vendor,tests,*.blade.php --extensions=php --standard=PSR2 .",
+      "php tests/TemplateResolutionTest.php"
     ]
   },
   "archive" : {

@@ -30,7 +30,6 @@ class TheEventsCalendarServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../publishes/resources/views' => $this->app->resourcePath('views/tribe/events/v2'),
         ], 'TheEventsCalendar Templates');
-
     }
 
     public function bindFilters()
@@ -38,6 +37,6 @@ class TheEventsCalendarServiceProvider extends ServiceProvider
         $tribeEvents = $this->app['tribe_events'];
 
         add_filter('tribe_template_theme_path_list', [$tribeEvents, 'tribeTemplateThemePathList'], 10, 1);
-        add_filter( 'tribe_template_file', [$tribeEvents, 'templateInclude'], 51);
+        add_filter('tribe_template_file', [$tribeEvents, 'templateInclude'], 51);
     }
 }
